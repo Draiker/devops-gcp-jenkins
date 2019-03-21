@@ -8,7 +8,7 @@ sudo yum -y install epel-release
 sudo yum -y install ansible
 
 #install java amazon corretto JDK and JRE
-sudo wget https://d1f2yzg3dx5xke.cloudfront.net/java-1.8.0-amazon-corretto-devel-1.8.0_202.b08-1.amzn2.x86_64.rpm
+#sudo wget https://d1f2yzg3dx5xke.cloudfront.net/java-1.8.0-amazon-corretto-devel-1.8.0_202.b08-1.amzn2.x86_64.rpm
 sudo wget https://d1f2yzg3dx5xke.cloudfront.net/java-1.8.0-amazon-corretto-1.8.0_202.b08-1.amzn2.x86_64.rpm
 sudo yum localinstall -y java-1.8.0-amazon-corretto*.rpm
 
@@ -38,6 +38,8 @@ sudo wget https://www-us.apache.org/dist/maven/maven-3/3.6.0/binaries/apache-mav
 
 #Extract maven
 sudo tar -xzf /tmp/apache-maven-3.6.0-bin.tar.gz -C /opt
+
+sudo sed -i 's/<useSecurity>true/<useSecurity>false/' /var/lib/jenkins/config.xml
 
 #create a symbolic link maven which will point to the Maven installation directory
 sudo ln -s /opt/apache-maven-3.6.0 /opt/maven

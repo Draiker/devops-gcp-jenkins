@@ -34,7 +34,10 @@ variable "firewall_network" {
   default = "default"
 }
 
-variable "public_key" {
-  default = "Your_Public_Key_in_RSA_Format"
+variable "public_key_path" {
+  default = ".credentials/key public OpenSSH.pub"
+}
+variable "private_key_path" {
+  default = ".credentials/key private OpenSSH.pem"
 }
 

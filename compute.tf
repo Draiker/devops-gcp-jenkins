@@ -1,19 +1,12 @@
-resource "google_compute_firewall" "ac-jenkins" {
+resource "google_compute_firewall" "jenkins" {
   name = "${var.firewall_name}"
   network = "${var.firewall_network}"
 
   allow {
     protocol = "tcp"
-    ports = ["8080"]
+    ports = ["22", "80", "8080", "443"]
   }
   source_ranges = ["0.0.0.0/0"]
-}
-resource "google_compute_subnetwork" "default" {
-  name                     = "${var.network_name}"
-  ip_cidr_range            = "${var.network_cidr}"
-  network                  = "${google_compute_network.default.self_link}"
-  region                   = "${var.region}"
-  private_ip_google_access = true
 }
 resource "google_compute_instance" "vm_instance" {
   name         = "${var.instance_name}"
@@ -28,10 +21,41 @@ resource "google_compute_instance" "vm_instance" {
   }
 
   network_interface {
-    subnetwork    = "${google_compute_subnetwork.default.name}"
+    network    = "default"
     access_config {
 
     }
   }
-  #metadata_startup_script = "${file("./startup.centos-7.sh")}"
+  metadata {
+    ssh-keys = "draiker_ds:${file("${var.public_key_path}")}"
+  }
+  service_account {
+    scopes = ["userinfo-email", "compute-ro", "storage-ro"]
+  }
+
+  provisioner "file" {
+    source = "scripts/startup.centos-7.sh"
+    destination = "/tmp/startup.centos-7.sh"
+
+    connection {
+      type = "ssh"
+      user = "draiker_ds"
+      private_key = "${file("${var.private_key_path}")}"
+      agent = false
+    }
+  }
+
+  provisioner "remote-exec" {
+    connection {
+      type = "ssh"
+      user = "draiker_ds"
+      private_key = "${file("${var.private_key_path}")}"
+      agent = false
+    }
+
+    inline = [
+      "chmod +x /tmp/startup.centos-7.sh",
+      "/tmp/startup.centos-7.sh"
+    ]
+  }
 }
